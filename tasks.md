@@ -31,11 +31,11 @@
 - [x] 6.1 Implement `DELETE /products` in `app/routers/admin.py` to remove all product records with confirmation guard (e.g., query param or header).
 
 ## 7. Webhook Management API
-- [ ] 7.1 Implement `GET /webhooks` in `app/routers/webhooks.py` to list all webhooks.
-- [ ] 7.2 Implement `POST /webhooks` to create webhook with URL validation and event type.
-- [ ] 7.3 Implement `PUT /webhooks/{id}` to update webhook fields and active status.
-- [ ] 7.4 Implement `DELETE /webhooks/{id}` to delete webhook.
-- [ ] 7.5 Implement `POST /webhooks/test/{id}` to trigger webhook test using `app/tasks/webhook_sender.py`, returning response code/time/error.
+- [x] 7.1 Implement `GET /webhooks` in `app/routers/webhooks.py` to list all webhooks.
+- [x] 7.2 Implement `POST /webhooks` to create webhook with URL validation and event type.
+- [x] 7.3 Implement `PUT /webhooks/{id}` to update webhook fields and active status.
+- [x] 7.4 Implement `DELETE /webhooks/{id}` to delete webhook.
+- [x] 7.5 Implement `POST /webhooks/test/{id}` to trigger webhook test using `app/tasks/webhook_sender.py`, returning response code/time/error.
 
 ## 8. Services and Utilities
 - [ ] 8.1 Build `product_service.py` for CRUD, pagination, filtering, and SKU normalization logic.
