@@ -93,3 +93,9 @@ class ProductService:
         self.db.delete(product)
         self.db.commit()
         return True
+
+    def delete_all_products(self) -> int:
+        """Delete all products and return count."""
+        count = self.db.query(Product).delete()
+        self.db.commit()
+        return count

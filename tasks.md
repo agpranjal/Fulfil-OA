@@ -28,7 +28,7 @@
 - [x] 5.4 Implement `DELETE /products/{id}` to delete a single product with graceful handling of missing IDs.
 
 ## 6. Bulk Delete
-- [ ] 6.1 Implement `DELETE /products` in `app/routers/admin.py` to remove all product records with confirmation guard (e.g., query param or header).
+- [x] 6.1 Implement `DELETE /products` in `app/routers/admin.py` to remove all product records with confirmation guard (e.g., query param or header).
 
 ## 7. Webhook Management API
 - [ ] 7.1 Implement `GET /webhooks` in `app/routers/webhooks.py` to list all webhooks.
