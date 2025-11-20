@@ -12,9 +12,9 @@
 - [x] 2.4 Create Pydantic schemas in `app/schemas.py` for product read/write, webhook read/write, paginated responses, and upload status payload.
 
 ## 3. Background Processing
-- [ ] 3.1 Configure Celery app in `app/celery_app.py` with broker/backend settings and autodiscover tasks.
-- [ ] 3.2 Implement CSV import task in `app/tasks/importer.py` to stream/process chunks (10k–50k rows), lowercase SKUs, upsert/overwrite existing products, and update progress tracking.
-- [ ] 3.3 Implement progress tracking utility in `app/services/progress.py` to store/read task state (`status`, counts, percent, message, errors).
+- [x] 3.1 Configure Celery app in `app/celery_app.py` with broker/backend settings and autodiscover tasks.
+- [x] 3.2 Implement CSV import task in `app/tasks/importer.py` to stream/process chunks (10k–50k rows), lowercase SKUs, upsert/overwrite existing products, and update progress tracking.
+- [x] 3.3 Implement progress tracking utility in `app/services/progress.py` to store/read task state (`status`, counts, percent, message, errors).
 
 ## 4. CSV Upload Feature
 - [ ] 4.1 Implement `POST /upload` in `app/routers/upload.py` to accept CSV upload (max 500k rows), persist temp file, enqueue Celery import task, and return `task_id`.

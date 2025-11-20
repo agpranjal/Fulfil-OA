@@ -19,9 +19,9 @@ def create_celery_app() -> Celery:
         result_serializer="json",
         accept_content=["json"],
         task_track_started=True,
+        task_time_limit=60 * 60,  # 1 hour safety cap
     )
     return celery
 
 
 celery_app = create_celery_app()
-
