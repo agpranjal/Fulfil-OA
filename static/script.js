@@ -136,8 +136,9 @@ function initUploadPage() {
   const statusMessage = qs("#status-message");
   const taskLabel = qs("#task-id-label");
   const errorBox = qs("#error-box");
-  const refreshBtn = qs("#refresh-status");
-  let pollId = null;
+  let pollTimeout = null;
+  let polling = false;
+  let inFlight = false;
   let currentTask = null;
   let lastStatus = null;
   let stalePolls = 0;
@@ -155,29 +156,47 @@ function initUploadPage() {
       stalePolls += 1;
     }
     // If stuck queued/processing for a while, hint about worker.
-    if (stalePolls > 5 && data.status !== "completed") {
-      statusMessage.textContent = `${data.message || data.status} (ensure Celery worker is running)`;
+    // if (stalePolls > 5 && data.status !== "completed") {
+    //   statusMessage.textContent = `${data.message || data.status} (ensure Celery worker is running)`;
+    // }
+  }
+
+  function stopPolling() {
+    if (pollTimeout) {
+      clearTimeout(pollTimeout);
+      pollTimeout = null;
     }
+    polling = false;
+  }
+
+  function schedulePoll() {
+    stopPolling();
+    polling = true;
+    pollTimeout = setTimeout(() => {
+      pollTimeout = null;
+      fetchStatus();
+    }, 500);
   }
 
   async function fetchStatus() {
     if (!currentTask) return;
+    if (inFlight) return;
+    inFlight = true;
     try {
       const data = await api.uploadStatus(currentTask);
       updateStatus(data);
       if (["completed", "error"].includes(data.status)) {
-        if (pollId) {
-          clearInterval(pollId);
-          pollId = null;
-        }
+        stopPolling();
       }
     } catch (err) {
       statusMessage.textContent = err.message;
       toggle(errorBox, true);
       errorBox.textContent = err.message;
-      if (pollId) {
-        clearInterval(pollId);
-        pollId = null;
+      stopPolling();
+    } finally {
+      inFlight = false;
+      if (polling && lastStatus !== "completed" && lastStatus !== "error") {
+        schedulePoll();
       }
     }
   }
@@ -191,18 +210,20 @@ function initUploadPage() {
       taskLabel.textContent = `Task ID: ${task_id}`;
       toggle(statusCard, true);
       toggle(errorBox, false);
-      if (pollId) clearInterval(pollId);
+      stopPolling();
       await fetchStatus();
-      pollId = setInterval(fetchStatus, 2000);
+      schedulePoll();
     } catch (err) {
+      progressBar.style.width = "0%";
+      processed.textContent = "0";
+      total.textContent = "0";
+      statusLabel.textContent = "error";
+      statusMessage.textContent = err.message || "Upload failed";
       errorBox.textContent = err.message || "Upload failed";
       toggle(errorBox, true);
+      toggle(statusCard, true);
+      stopPolling();
     }
-  });
-
-  refreshBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    fetchStatus();
   });
 }
 
