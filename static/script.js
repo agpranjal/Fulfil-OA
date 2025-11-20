@@ -170,6 +170,10 @@ function initProductsPage() {
   let page = 1;
   let totalPages = 1;
 
+   const renderMessageRow = (message) => {
+    tableBody.innerHTML = `<tr><td colspan="6" class="muted">${message}</td></tr>`;
+  };
+
   function openModal(mode = "create", product = null) {
     qs("#product-modal-title").textContent = mode === "edit" ? "Edit Product" : "Create Product";
     form.reset();
@@ -192,33 +196,42 @@ function initProductsPage() {
   }
 
   async function loadProducts() {
-    const query = Object.fromEntries(new FormData(filtersForm).entries());
-    const params = {
-      page,
-      limit: 10,
-      ...query,
-      active: query.active === "" ? undefined : query.active,
-    };
-    const data = await api.listProducts(params);
-    page = data.page;
-    totalPages = data.total_pages;
-    tableBody.innerHTML = data.items
-      .map(
-        (p) => `<tr data-id="${p.id}">
-          <td>${p.sku}</td>
-          <td>${p.name || ""}</td>
-          <td>${p.description || ""}</td>
-          <td>${p.price ?? ""}</td>
-          <td>${p.active ? "Active" : "Inactive"}</td>
-          <td class="table-actions">
-            <button class="btn btn--ghost" data-action="edit">Edit</button>
-            <button class="btn btn--ghost" data-action="delete">Delete</button>
-          </td>
-        </tr>`
-      )
-      .join("");
-    pagination.querySelector("[data-page-current]").textContent = data.page;
-    pagination.querySelector("[data-page-total]").textContent = data.total_pages || 1;
+    try {
+      const query = Object.fromEntries(new FormData(filtersForm).entries());
+      const params = {
+        page,
+        limit: 10,
+        ...query,
+        active: query.active === "" ? undefined : query.active,
+      };
+      const data = await api.listProducts(params);
+      page = data.page;
+      totalPages = data.total_pages;
+      if (!data.items.length) {
+        renderMessageRow("No products found.");
+      } else {
+        tableBody.innerHTML = data.items
+          .map(
+            (p) => `<tr data-id="${p.id}">
+              <td>${p.sku}</td>
+              <td>${p.name || ""}</td>
+              <td>${p.description || ""}</td>
+              <td>${p.price ?? ""}</td>
+              <td>${p.active ? "Active" : "Inactive"}</td>
+              <td class="table-actions">
+                <button class="btn btn--ghost" data-action="edit">Edit</button>
+                <button class="btn btn--ghost" data-action="delete">Delete</button>
+              </td>
+            </tr>`
+          )
+          .join("");
+      }
+      pagination.querySelector("[data-page-current]").textContent = data.page;
+      pagination.querySelector("[data-page-total]").textContent = data.total_pages || 1;
+    } catch (err) {
+      renderMessageRow(err.message || "Error loading products");
+      console.error(err);
+    }
   }
 
   filtersForm.addEventListener("submit", async (e) => {
