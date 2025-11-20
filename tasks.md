@@ -38,9 +38,9 @@
 - [x] 7.5 Implement `POST /webhooks/test/{id}` to trigger webhook test using `app/tasks/webhook_sender.py`, returning response code/time/error.
 
 ## 8. Services and Utilities
-- [ ] 8.1 Build `product_service.py` for CRUD, pagination, filtering, and SKU normalization logic.
-- [ ] 8.2 Build `webhook_service.py` for CRUD, enable/disable toggling, and test dispatch helper.
-- [ ] 8.3 Add generic helpers in `app/utils/helpers.py` for common responses, error handling, and CSV validation utilities.
+- [x] 8.1 Build `product_service.py` for CRUD, pagination, filtering, and SKU normalization logic.
+- [x] 8.2 Build `webhook_service.py` for CRUD, enable/disable toggling, and test dispatch helper.
+- [x] 8.3 Add generic helpers in `app/utils/helpers.py` for common responses, error handling, and CSV validation utilities.
 
 ## 9. Frontend Templates
 - [ ] 9.1 Create `templates/upload.html` with file input, upload button, progress bar (parsing/validating/importing/percent), and error display; hook to API endpoints via JS.
