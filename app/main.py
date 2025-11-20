@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.config import get_settings
+from app.database import init_db
 from app.routers import admin, products, upload, webhooks
 
 
@@ -22,6 +23,10 @@ def create_app() -> FastAPI:
     # Serve raw HTML templates for simple navigation/testing.
     application.mount("/templates", StaticFiles(directory="templates", html=True), name="templates")
     application.state.templates = Jinja2Templates(directory="templates")
+
+    @application.on_event("startup")
+    def _startup() -> None:
+        init_db()
 
     return application
 
