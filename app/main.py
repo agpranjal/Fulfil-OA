@@ -19,10 +19,11 @@ def create_app() -> FastAPI:
     application.include_router(admin.router)
 
     application.mount("/static", StaticFiles(directory="static"), name="static")
+    # Serve raw HTML templates for simple navigation/testing.
+    application.mount("/templates", StaticFiles(directory="templates", html=True), name="templates")
     application.state.templates = Jinja2Templates(directory="templates")
 
     return application
 
 
 app = create_app()
-
