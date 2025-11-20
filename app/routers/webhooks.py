@@ -51,7 +51,7 @@ def delete_webhook(webhook_id: int, db: Session = Depends(get_db)) -> None:
 def test_webhook(webhook_id: int, db: Session = Depends(get_db)) -> dict:
     """Trigger webhook test task."""
     service = WebhookService(db)
-    target = service.update_webhook(webhook_id, WebhookUpdate())  # fetch current
+    target = service.get_webhook(webhook_id)
     if not target:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found.")
 
@@ -60,5 +60,5 @@ def test_webhook(webhook_id: int, db: Session = Depends(get_db)) -> dict:
         "timestamp": "2025-11-19T14:05:12Z",
         "message": "This is a test webhook fired from your product importer app.",
     }
-    task = send_webhook_task.delay(webhook_id, target.url, payload)
+    task = send_webhook_task.delay(webhook_id, str(target.url), payload)
     return {"task_id": task.id}

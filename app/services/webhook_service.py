@@ -15,6 +15,13 @@ class WebhookService:
     def __init__(self, db: Session):
         self.db = db
 
+    def get_webhook(self, webhook_id: int) -> Optional[WebhookRead]:
+        """Return a single webhook by id."""
+        webhook = self.db.get(Webhook, webhook_id)
+        if not webhook:
+            return None
+        return WebhookRead.model_validate(webhook)
+
     def list_webhooks(self) -> List[WebhookRead]:
         webhooks = self.db.execute(select(Webhook).order_by(Webhook.id.desc())).scalars().all()
         return [WebhookRead.model_validate(w) for w in webhooks]
