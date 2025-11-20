@@ -59,6 +59,14 @@ class WebhookRead(WebhookBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class PaginatedProducts(BaseModel):
+    items: list[ProductRead]
+    total: int
+    page: int
+    total_pages: int
+    limit: int
+
+
 class UploadStatus(BaseModel):
     status: str
     processed: int

@@ -22,10 +22,10 @@
 - [x] 4.3 Add CSV parsing helper in `app/utils/csv_parser.py` to validate rows and stream to importer in chunks with basic validation errors surfaced.
 
 ## 5. Product Management API
-- [ ] 5.1 Implement `GET /products` in `app/routers/products.py` with filters (`sku`, `name`, `active`, `description`) and pagination (`page`, `limit`), returning paginated list.
-- [ ] 5.2 Implement `POST /products` to create product via service layer, enforcing lowercase unique `sku`.
-- [ ] 5.3 Implement `PUT /products/{id}` to update product fields, keeping SKU case-insensitive uniqueness.
-- [ ] 5.4 Implement `DELETE /products/{id}` to delete a single product with graceful handling of missing IDs.
+- [x] 5.1 Implement `GET /products` in `app/routers/products.py` with filters (`sku`, `name`, `active`, `description`) and pagination (`page`, `limit`), returning paginated list.
+- [x] 5.2 Implement `POST /products` to create product via service layer, enforcing lowercase unique `sku`.
+- [x] 5.3 Implement `PUT /products/{id}` to update product fields, keeping SKU case-insensitive uniqueness.
+- [x] 5.4 Implement `DELETE /products/{id}` to delete a single product with graceful handling of missing IDs.
 
 ## 6. Bulk Delete
 - [ ] 6.1 Implement `DELETE /products` in `app/routers/admin.py` to remove all product records with confirmation guard (e.g., query param or header).
