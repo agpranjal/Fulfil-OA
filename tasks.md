@@ -49,8 +49,8 @@
 - [x] 9.4 Create `templates/webhooks.html` with list view, add/edit/delete controls, enable/disable toggle, “Test Webhook” button, and display of response code/time/error.
 
 ## 10. Frontend Assets
-- [ ] 10.1 Implement `static/script.js` to handle form submissions, poll upload status, render progress, and manage CRUD UX for products and webhooks.
-- [ ] 10.2 Implement `static/styles.css` for consistent layout, tables, modals, buttons, progress bars, and state feedback.
+- [x] 10.1 Implement `static/script.js` to handle form submissions, poll upload status, render progress, and manage CRUD UX for products and webhooks.
+- [x] 10.2 Implement `static/styles.css` for consistent layout, tables, modals, buttons, progress bars, and state feedback.
 
 ## 11. Testing and Validation Hooks
 - [ ] 11.1 Add input validation for CSV size (<=500,000 rows) and server-side error messaging for invalid rows.
