@@ -3,13 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload</title>
+  <title>Product CSV Upload</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <h1>CSV Upload</h1>
-  <!-- Implement upload UI in frontend tasks. -->
+<body class="page">
+  <header class="page__header">
+    <div class="brand">Product Importer</div>
+    <nav class="nav">
+      <a href="/templates/upload.html" class="nav__link nav__link--active">Upload</a>
+      <a href="/templates/products.html" class="nav__link">Products</a>
+      <a href="/templates/webhooks.html" class="nav__link">Webhooks</a>
+      <a href="/templates/admin.html" class="nav__link">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page__content">
+    <section class="panel">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">CSV Product Upload</p>
+          <h1 class="panel__title">Import up to 500,000 products</h1>
+          <p class="panel__subtitle">Upload a CSV with columns: sku, name, description, price, active.</p>
+        </div>
+      </div>
+      <form id="upload-form" class="form form--upload">
+        <label class="form__label">Select CSV file</label>
+        <div class="upload-drop">
+          <input id="upload-input" type="file" name="file" accept=".csv" required>
+          <p class="muted">Drag a CSV here or click to choose.</p>
+        </div>
+        <div class="form__actions">
+          <button type="submit" id="upload-button" class="btn btn--primary">Upload &amp; Start Import</button>
+          <span class="help-text">Large files are processed in the background; keep this tab open to watch progress.</span>
+        </div>
+      </form>
+
+      <div id="upload-status" class="status-card hidden">
+        <div class="status-card__header">
+          <div>
+            <p class="eyebrow">Import Status</p>
+            <p class="status-card__task" id="task-id-label">Task ID: —</p>
+          </div>
+          <button id="refresh-status" class="btn btn--ghost">Refresh</button>
+        </div>
+        <div class="progress">
+          <div class="progress__bar" id="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="status-grid">
+          <div>
+            <p class="eyebrow">Status</p>
+            <p id="status-label">—</p>
+          </div>
+          <div>
+            <p class="eyebrow">Processed</p>
+            <p><span id="processed-count">0</span> / <span id="total-count">0</span></p>
+          </div>
+          <div>
+            <p class="eyebrow">Message</p>
+            <p id="status-message">Waiting to start</p>
+          </div>
+        </div>
+        <div id="error-box" class="alert alert--error hidden"></div>
+      </div>
+    </section>
+  </main>
+
   <script src="/static/script.js"></script>
 </body>
 </html>
-

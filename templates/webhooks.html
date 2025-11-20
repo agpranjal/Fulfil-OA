@@ -6,10 +6,73 @@
   <title>Webhooks</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <h1>Webhooks</h1>
-  <!-- Implement webhook management UI in frontend tasks. -->
+<body class="page">
+  <header class="page__header">
+    <div class="brand">Product Importer</div>
+    <nav class="nav">
+      <a href="/templates/upload.html" class="nav__link">Upload</a>
+      <a href="/templates/products.html" class="nav__link">Products</a>
+      <a href="/templates/webhooks.html" class="nav__link nav__link--active">Webhooks</a>
+      <a href="/templates/admin.html" class="nav__link">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page__content">
+    <section class="panel">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">Webhook Management</p>
+          <h1 class="panel__title">Send events to external systems</h1>
+        </div>
+        <button id="open-webhook-create" class="btn btn--primary">New Webhook</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table" id="webhooks-table">
+          <thead>
+            <tr>
+              <th>URL</th>
+              <th>Event Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows injected by script.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="webhook-modal">
+    <div class="modal__card">
+      <header class="modal__header">
+        <h2 id="webhook-modal-title">Create Webhook</h2>
+        <button class="modal__close" data-close-modal>&times;</button>
+      </header>
+      <form id="webhook-form" class="form">
+        <input type="hidden" name="id" id="webhook-id">
+        <label class="form__label">URL</label>
+        <input type="url" name="url" id="webhook-url" required placeholder="https://example.com/webhook">
+
+        <label class="form__label">Event Type</label>
+        <input type="text" name="event_type" id="webhook-event" required placeholder="product.imported">
+
+        <label class="form__label">Active</label>
+        <select name="active" id="webhook-active">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">Save</button>
+          <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="/static/script.js"></script>
 </body>
 </html>
-

@@ -6,10 +6,114 @@
   <title>Products</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <h1>Products</h1>
-  <!-- Implement product table and filters in frontend tasks. -->
+<body class="page">
+  <header class="page__header">
+    <div class="brand">Product Importer</div>
+    <nav class="nav">
+      <a href="/templates/upload.html" class="nav__link">Upload</a>
+      <a href="/templates/products.html" class="nav__link nav__link--active">Products</a>
+      <a href="/templates/webhooks.html" class="nav__link">Webhooks</a>
+      <a href="/templates/admin.html" class="nav__link">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page__content">
+    <section class="panel">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">Product Management</p>
+          <h1 class="panel__title">Browse, filter, and edit products</h1>
+        </div>
+        <button id="open-create" class="btn btn--primary">New Product</button>
+      </div>
+
+      <form id="product-filters" class="filters">
+        <div class="filter">
+          <label class="form__label">SKU</label>
+          <input type="text" name="sku" placeholder="Search SKU">
+        </div>
+        <div class="filter">
+          <label class="form__label">Name</label>
+          <input type="text" name="name" placeholder="Search name">
+        </div>
+        <div class="filter">
+          <label class="form__label">Description</label>
+          <input type="text" name="description" placeholder="Search description">
+        </div>
+        <div class="filter">
+          <label class="form__label">Active</label>
+          <select name="active">
+            <option value="">Any</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <div class="filter filter--actions">
+          <button type="submit" class="btn btn--primary">Apply</button>
+          <button type="button" id="reset-filters" class="btn btn--ghost">Reset</button>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="data-table" id="products-table">
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows injected by script.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="products-pagination">
+        <button class="btn btn--ghost" data-page="prev">Prev</button>
+        <span class="pagination__info">Page <span data-page-current>1</span> of <span data-page-total>1</span></span>
+        <button class="btn btn--ghost" data-page="next">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="product-modal">
+    <div class="modal__card">
+      <header class="modal__header">
+        <h2 id="product-modal-title">Create Product</h2>
+        <button class="modal__close" data-close-modal>&times;</button>
+      </header>
+      <form id="product-form" class="form">
+        <input type="hidden" name="id" id="product-id">
+        <label class="form__label">SKU</label>
+        <input type="text" name="sku" id="product-sku" required>
+
+        <label class="form__label">Name</label>
+        <input type="text" name="name" id="product-name">
+
+        <label class="form__label">Description</label>
+        <textarea name="description" id="product-description"></textarea>
+
+        <label class="form__label">Price</label>
+        <input type="number" step="0.01" name="price" id="product-price">
+
+        <label class="form__label">Active</label>
+        <select name="active" id="product-active">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">Save</button>
+          <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="/static/script.js"></script>
 </body>
 </html>
-

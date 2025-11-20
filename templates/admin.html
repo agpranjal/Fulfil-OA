@@ -6,10 +6,39 @@
   <title>Admin</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <h1>Admin</h1>
-  <!-- Implement bulk delete UI in frontend tasks. -->
+<body class="page">
+  <header class="page__header">
+    <div class="brand">Product Importer</div>
+    <nav class="nav">
+      <a href="/templates/upload.html" class="nav__link">Upload</a>
+      <a href="/templates/products.html" class="nav__link">Products</a>
+      <a href="/templates/webhooks.html" class="nav__link">Webhooks</a>
+      <a href="/templates/admin.html" class="nav__link nav__link--active">Admin</a>
+    </nav>
+  </header>
+
+  <main class="page__content">
+    <section class="panel panel--danger">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">Danger Zone</p>
+          <h1 class="panel__title">Delete all products</h1>
+          <p class="panel__subtitle">Removes every product record. This cannot be undone.</p>
+        </div>
+      </div>
+      <div class="alert alert--warning">
+        <strong>Warning:</strong> This operation is destructive. Ensure you have backups before proceeding.
+      </div>
+      <div class="form__actions">
+        <button id="delete-all" class="btn btn--danger">Delete All Products</button>
+        <label class="inline-checkbox">
+          <input type="checkbox" id="confirm-delete"> I understand this will remove all products.
+        </label>
+      </div>
+      <div id="delete-result" class="alert hidden"></div>
+    </section>
+  </main>
+
   <script src="/static/script.js"></script>
 </body>
 </html>
-
