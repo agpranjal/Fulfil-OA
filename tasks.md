@@ -17,9 +17,9 @@
 - [x] 3.3 Implement progress tracking utility in `app/services/progress.py` to store/read task state (`status`, counts, percent, message, errors).
 
 ## 4. CSV Upload Feature
-- [ ] 4.1 Implement `POST /upload` in `app/routers/upload.py` to accept CSV upload (max 500k rows), persist temp file, enqueue Celery import task, and return `task_id`.
-- [ ] 4.2 Implement `GET /upload/status/{task_id}` in `app/routers/upload.py` to return progress payload with status, processed, total, percent, and message.
-- [ ] 4.3 Add CSV parsing helper in `app/utils/csv_parser.py` to validate rows and stream to importer in chunks with basic validation errors surfaced.
+- [x] 4.1 Implement `POST /upload` in `app/routers/upload.py` to accept CSV upload (max 500k rows), persist temp file, enqueue Celery import task, and return `task_id`.
+- [x] 4.2 Implement `GET /upload/status/{task_id}` in `app/routers/upload.py` to return progress payload with status, processed, total, percent, and message.
+- [x] 4.3 Add CSV parsing helper in `app/utils/csv_parser.py` to validate rows and stream to importer in chunks with basic validation errors surfaced.
 
 ## 5. Product Management API
 - [ ] 5.1 Implement `GET /products` in `app/routers/products.py` with filters (`sku`, `name`, `active`, `description`) and pagination (`page`, `limit`), returning paginated list.
