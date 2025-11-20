@@ -43,10 +43,10 @@
 - [x] 8.3 Add generic helpers in `app/utils/helpers.py` for common responses, error handling, and CSV validation utilities.
 
 ## 9. Frontend Templates
-- [ ] 9.1 Create `templates/upload.html` with file input, upload button, progress bar (parsing/validating/importing/percent), and error display; hook to API endpoints via JS.
-- [ ] 9.2 Create `templates/products.html` with product table, filters, pagination controls, create/edit modal or inline form, and delete action wired to APIs.
-- [ ] 9.3 Create `templates/admin.html` with “Delete All Products” button and confirmation prompt tied to bulk delete API.
-- [ ] 9.4 Create `templates/webhooks.html` with list view, add/edit/delete controls, enable/disable toggle, “Test Webhook” button, and display of response code/time/error.
+- [x] 9.1 Create `templates/upload.html` with file input, upload button, progress bar (parsing/validating/importing/percent), and error display; hook to API endpoints via JS.
+- [x] 9.2 Create `templates/products.html` with product table, filters, pagination controls, create/edit modal or inline form, and delete action wired to APIs.
+- [x] 9.3 Create `templates/admin.html` with “Delete All Products” button and confirmation prompt tied to bulk delete API.
+- [x] 9.4 Create `templates/webhooks.html` with list view, add/edit/delete controls, enable/disable toggle, “Test Webhook” button, and display of response code/time/error.
 
 ## 10. Frontend Assets
 - [ ] 10.1 Implement `static/script.js` to handle form submissions, poll upload status, render progress, and manage CRUD UX for products and webhooks.
