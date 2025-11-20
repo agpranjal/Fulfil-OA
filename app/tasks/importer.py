@@ -8,7 +8,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.celery_app import celery_app
 from app.database import SessionLocal
 from app.models import Product
-from app.services.progress import progress_store
 from app.utils.csv_parser import chunk_products
 
 
@@ -40,26 +39,50 @@ def import_products_task(self, file_path: str, total_rows: Optional[int] = None,
         total_rows: Optional total count for percent calculations.
         chunk_size: Batch size for DB writes.
     """
-    task_id = self.request.id or "unknown"
     processed = 0
-    progress_store.update_progress(task_id, processed=processed, total=total_rows or 0, message="Starting import")
+    total = total_rows or 0
+    self.update_state(
+        state="PROGRESS",
+        meta={"status": "processing", "processed": processed, "total": total, "percent": 0.0, "message": "Starting"},
+    )
 
     try:
         for chunk in chunk_products(file_path, chunk_size=chunk_size):
             with SessionLocal() as session:
                 processed += _upsert_products(session, chunk)
-            progress_store.update_progress(
-                task_id,
-                processed=processed,
-                total=total_rows or max(processed, 1),
-                message=f"Processed {processed} rows",
+            current_total = total or processed
+            percent = round((processed / current_total) * 100, 2) if current_total else 0.0
+            self.update_state(
+                state="PROGRESS",
+                meta={
+                    "status": "processing",
+                    "processed": processed,
+                    "total": current_total,
+                    "percent": percent,
+                    "message": f"Processed {processed} rows",
+                },
             )
 
-        progress_store.mark_complete(task_id, processed=processed, total=total_rows or processed)
-        return {"status": "completed", "processed": processed}
+        final_total = total or processed
+        return {
+            "status": "completed",
+            "processed": processed,
+            "total": final_total,
+            "percent": 100.0 if final_total else 0.0,
+            "message": "Completed",
+        }
 
     except (SQLAlchemyError, OSError, ValueError) as exc:
-        progress_store.mark_error(
-            task_id, processed=processed, total=total_rows or max(processed, 1), error=str(exc)
+        current_total = total or processed or 1
+        percent = round((processed / current_total) * 100, 2)
+        self.update_state(
+            state="FAILURE",
+            meta={
+                "status": "error",
+                "processed": processed,
+                "total": current_total,
+                "percent": percent,
+                "message": str(exc),
+            },
         )
         raise

@@ -1,80 +1,92 @@
+const API_BASE = window.location.origin;
+
+async function handleResponse(res, fallbackMessage = "Request failed") {
+  let body;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+  if (!res.ok) {
+    let detail = fallbackMessage;
+    if (body) {
+      if (typeof body.detail === "string") detail = body.detail;
+      else if (body.detail && typeof body.detail === "object") detail = JSON.stringify(body.detail);
+    } else if (res.statusText) {
+      detail = res.statusText;
+    }
+    throw new Error(detail);
+  }
+  return body;
+}
+
 const api = {
   async uploadFile(file) {
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch("/upload", { method: "POST", body: form });
-    if (!res.ok) throw new Error((await res.json()).detail || "Upload failed");
-    return res.json();
+    const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: form });
+    return handleResponse(res, "Upload failed");
   },
   async uploadStatus(taskId) {
-    const res = await fetch(`/upload/status/${taskId}`);
-    if (!res.ok) throw new Error("Unable to fetch status");
-    return res.json();
+    const res = await fetch(`${API_BASE}/upload/status/${taskId}`);
+    return handleResponse(res, "Unable to fetch status");
   },
   async listProducts(params = {}) {
     const query = new URLSearchParams(params);
-    const res = await fetch(`/products?${query.toString()}`);
-    if (!res.ok) throw new Error("Failed to fetch products");
-    return res.json();
+    const res = await fetch(`${API_BASE}/products?${query.toString()}`);
+    return handleResponse(res, "Failed to fetch products");
   },
   async createProduct(payload) {
-    const res = await fetch("/products", {
+    const res = await fetch(`${API_BASE}/products`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("Failed to create product");
-    return res.json();
+    return handleResponse(res, "Failed to create product");
   },
   async updateProduct(id, payload) {
-    const res = await fetch(`/products/${id}`, {
+    const res = await fetch(`${API_BASE}/products/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("Failed to update product");
-    return res.json();
+    return handleResponse(res, "Failed to update product");
   },
   async deleteProduct(id) {
-    const res = await fetch(`/products/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete product");
+    const res = await fetch(`${API_BASE}/products/${id}`, { method: "DELETE" });
+    return handleResponse(res, "Failed to delete product");
   },
   async deleteAllProducts() {
-    const res = await fetch("/products?confirm=true", { method: "DELETE" });
-    if (!res.ok) throw new Error((await res.json()).detail || "Delete failed");
-    return res.json();
+    const res = await fetch(`${API_BASE}/products?confirm=true`, { method: "DELETE" });
+    return handleResponse(res, "Delete failed");
   },
   async listWebhooks() {
-    const res = await fetch("/webhooks");
-    if (!res.ok) throw new Error("Failed to fetch webhooks");
-    return res.json();
+    const res = await fetch(`${API_BASE}/webhooks`);
+    return handleResponse(res, "Failed to fetch webhooks");
   },
   async createWebhook(payload) {
-    const res = await fetch("/webhooks", {
+    const res = await fetch(`${API_BASE}/webhooks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("Failed to create webhook");
-    return res.json();
+    return handleResponse(res, "Failed to create webhook");
   },
   async updateWebhook(id, payload) {
-    const res = await fetch(`/webhooks/${id}`, {
+    const res = await fetch(`${API_BASE}/webhooks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("Failed to update webhook");
-    return res.json();
+    return handleResponse(res, "Failed to update webhook");
   },
   async deleteWebhook(id) {
-    const res = await fetch(`/webhooks/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete webhook");
+    const res = await fetch(`${API_BASE}/webhooks/${id}`, { method: "DELETE" });
+    return handleResponse(res, "Failed to delete webhook");
   },
   async testWebhook(id) {
-    const res = await fetch(`/webhooks/test/${id}`, { method: "POST" });
-    if (!res.ok) throw new Error("Failed to trigger test webhook");
-    return res.json();
+    const res = await fetch(`${API_BASE}/webhooks/test/${id}`, { method: "POST" });
+    return handleResponse(res, "Failed to trigger test webhook");
   },
 };
 
@@ -101,6 +113,16 @@ function parseBool(val) {
   return val === true || val === "true";
 }
 
+function pruneEmptyParams(params) {
+  const cleaned = { ...params };
+  Object.keys(cleaned).forEach((key) => {
+    if (cleaned[key] === "" || cleaned[key] === undefined || cleaned[key] === "undefined") {
+      delete cleaned[key];
+    }
+  });
+  return cleaned;
+}
+
 function initUploadPage() {
   const form = qs("#upload-form");
   if (!form) return;
@@ -117,18 +139,46 @@ function initUploadPage() {
   const refreshBtn = qs("#refresh-status");
   let pollId = null;
   let currentTask = null;
+  let lastStatus = null;
+  let stalePolls = 0;
+
+  function updateStatus(data) {
+    progressBar.style.width = `${data.percent}%`;
+    processed.textContent = data.processed;
+    total.textContent = data.total;
+    statusLabel.textContent = data.status;
+    statusMessage.textContent = data.message || "";
+    if (data.status !== lastStatus) {
+      stalePolls = 0;
+      lastStatus = data.status;
+    } else {
+      stalePolls += 1;
+    }
+    // If stuck queued/processing for a while, hint about worker.
+    if (stalePolls > 5 && data.status !== "completed") {
+      statusMessage.textContent = `${data.message || data.status} (ensure Celery worker is running)`;
+    }
+  }
 
   async function fetchStatus() {
     if (!currentTask) return;
     try {
       const data = await api.uploadStatus(currentTask);
-      progressBar.style.width = `${data.percent}%`;
-      processed.textContent = data.processed;
-      total.textContent = data.total;
-      statusLabel.textContent = data.status;
-      statusMessage.textContent = data.message || "";
+      updateStatus(data);
+      if (["completed", "error"].includes(data.status)) {
+        if (pollId) {
+          clearInterval(pollId);
+          pollId = null;
+        }
+      }
     } catch (err) {
       statusMessage.textContent = err.message;
+      toggle(errorBox, true);
+      errorBox.textContent = err.message;
+      if (pollId) {
+        clearInterval(pollId);
+        pollId = null;
+      }
     }
   }
 
@@ -141,8 +191,8 @@ function initUploadPage() {
       taskLabel.textContent = `Task ID: ${task_id}`;
       toggle(statusCard, true);
       toggle(errorBox, false);
-      await fetchStatus();
       if (pollId) clearInterval(pollId);
+      await fetchStatus();
       pollId = setInterval(fetchStatus, 2000);
     } catch (err) {
       errorBox.textContent = err.message || "Upload failed";
@@ -198,12 +248,11 @@ function initProductsPage() {
   async function loadProducts() {
     try {
       const query = Object.fromEntries(new FormData(filtersForm).entries());
-      const params = {
+      const params = pruneEmptyParams({
         page,
         limit: 10,
         ...query,
-        active: query.active === "" ? undefined : query.active,
-      };
+      });
       const data = await api.listProducts(params);
       page = data.page;
       totalPages = data.total_pages;

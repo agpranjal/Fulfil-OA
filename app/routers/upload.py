@@ -1,18 +1,17 @@
 """Upload routes."""
 
-from __future__ import annotations
-
 import csv
 import os
 from pathlib import Path
 from typing import Dict
 from uuid import uuid4
 
+from celery.result import AsyncResult
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
 from app.config import get_settings
+from app.celery_app import celery_app
 from app.schemas import UploadStatus
-from app.services.progress import progress_store
 from app.tasks.importer import import_products_task
 
 router = APIRouter(prefix="/upload", tags=["upload"])
@@ -66,7 +65,6 @@ async def upload_csv(file: UploadFile = File(...)) -> Dict[str, str]:
         )
 
     task = import_products_task.delay(str(temp_path), total_rows)
-    progress_store.update_progress(task.id, processed=0, total=total_rows, message="Queued")
 
     return {"task_id": task.id}
 
@@ -74,9 +72,23 @@ async def upload_csv(file: UploadFile = File(...)) -> Dict[str, str]:
 @router.get("/status/{task_id}", response_model=UploadStatus)
 def upload_status(task_id: str) -> UploadStatus:
     """Return background upload progress."""
-    payload = progress_store.get(task_id)
-    if not payload:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
+    result = AsyncResult(task_id, app=celery_app)
+    state = result.state
+    meta = result.info or {}
 
-    payload.pop("error", None)
-    return UploadStatus(**payload)
+    if state == "PENDING":
+        payload = {"status": "processing", "processed": 0, "total": 0, "percent": 0.0, "message": "Queued"}
+    elif state == "SUCCESS":
+        payload = meta if isinstance(meta, dict) else {}
+        payload.setdefault("status", "completed")
+    elif state in {"FAILURE", "REVOKED"}:
+        detail = meta.get("exc_message") if isinstance(meta, dict) else str(meta)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail or "Task failed")
+    else:
+        payload = meta if isinstance(meta, dict) else {}
+        payload.setdefault("status", "processing")
+
+    try:
+        return UploadStatus(**payload)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Invalid task status payload.")
