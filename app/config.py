@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "Product Importer"
-    database_url: str = "sqlite:///./product_importer.db"
+    database_url: str = "postgresql+psycopg2://app:app@db:5432/product_importer"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
     temp_upload_dir: str = "./tmp/uploads"

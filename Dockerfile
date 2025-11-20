@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY static ./static
 COPY templates ./templates
-COPY PRD.md README.md tasks.md .env.example ./ || true
+COPY PRD.md README.md tasks.md .env.example .env ./
 
 EXPOSE 8000
 
